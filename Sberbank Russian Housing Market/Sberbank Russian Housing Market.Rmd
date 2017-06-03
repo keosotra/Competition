@@ -1,3 +1,155 @@
 ---
 title: "Sberbank Russian Housing Market"
 ---
+## Step 1:
+```{r}
+house <- read.csv("https://github.com/keosotra/Competition/raw/master/Data/train.csv?raw=true", stringsAsFactors = FALSE)
+str(house)
+
+house <- read.csv("House.csv", stringsAsFactors = FALSE)
+str(house)
+
+```
+## Step 2:
+```{r}
+library(Amelia)
+missmap(house[1:20], main = "Missing values vs observed")
+```
+- missing values in each column
+```{r}
+library(funModeling)
+sapply(house,function(x) sum(is.na(x)))
+apply(is.na(house),2,sum)
+
+
+
+```
+- Number of unique values in each column
+```{r}
+sapply(house, function(x) length(unique(x)))
+```
+
+```{r}
+library(ggplot2)
+ggplot(house, aes(price_doc)) + geom_freqpoly()
+
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+ifelse(n <- sapply(house, function(x) length(levels(x))) == 1, "DROP", "NODROP")
+
+
+```
+
+## Step 3
+```{r}
+
+
+
+ins_model <- lm(price_doc ~ life_sq+	floor+	max_floor+	build_year+	num_room+	state+	product_type+	sub_area+	raion_popul+	children_preschool+	school_education_centers_raion+	healthcare_centers_raion+	sport_objects_raion+	shopping_centers_raion+	office_raion+	big_market_raion+	detention_facility_raion+	work_all+	build_count_before_1920+	build_count_1921_1945+	build_count_1946_1970+	build_count_1971_1995+	build_count_after_1995+	metro_min_walk+	public_transport_station_km+	office_count_500+	cafe_count_500+	cafe_sum_500_min_price_avg+	oil_urals+	cpi+	brent+	average_provision_of_build_contract_moscow+	mortgage_growth+	mortgage_rate+	income_per_cap+	salary_growth+	employment+	invest_fixed_capital_per_cap+	pop_natural_increase+	pop_migration+	childbirth, data = house) 
+
+
+```
+```{r}
+
+```
+
+```{r}
+summary(ins_model)
+
+```
+```{r}
+ins_model2 <- lm(price_doc ~ full_sq + floor+ max_floor+ build_year + state + product_type+work_all + raion_popul + children_preschool + school_education_centers_raion  + culture_objects_top_25 + culture_objects_top_25_raion + office_raion + oil_chemistry_raion + incineration_raion + kremlin_km + grp_growth + income_per_cap + cafe_count_5000_na_price  +  cafe_count_5000_price_1000 + office_count_5000 + cafe_count_5000 + leisure_count_5000 + sport_count_5000 + mosque_count_5000 + church_count_5000 + prom_part_5000 +theater_km  + university_km + workplaces_km,  data = house_macro) 
+
+
+```
+```{r}
+summary(ins_model2)
+
+```
+
+```{r}
+row.has.na <- apply(house1, 1, function(x){any(is.na(x))})
+sum(row.has.na)
+house.filtered <- house[!row.has.na,]
+lapply(train, function(x) any(is.na(x)))
+```
+
+```{r}
+samp <- sample(nrow(house_macro), 0.7 * nrow(house_macro))
+train <- house_macro[samp, ] 
+test <- house_macro[-samp, ]
+```
+
+```{r}
+
+house1 = read.csv("MyData.csv")
+house2 = house1[!row.has.na,]
+
+samp <- sample(nrow(house2), 0.7 * nrow(house2))
+train <- house2[samp, ] 
+test <- house2[-samp, ]
+
+
+
+library(randomForest)
+model <- randomForest(price_doc ~ full_sq + floor+ max_floor+ build_year + state + product_type+work_all + raion_popul + children_preschool + school_education_centers_raion  + culture_objects_top_25 + culture_objects_top_25_raion + office_raion + oil_chemistry_raion + incineration_raion + kremlin_km + grp_growth + income_per_cap + cafe_count_5000_na_price  +  cafe_count_5000_price_1000 + office_count_5000 + cafe_count_5000 + leisure_count_5000 + sport_count_5000 + mosque_count_5000 + church_count_5000 + prom_part_5000 +theater_km  + university_km + workplaces_km, data = train, ntree=500, mtry=1, na.action=na.exclude)
+
+plot(model)
+
+model
+
+
+pred <- predict(model, newdata = test)
+pred
+
+cor(pred, test$price_doc)
+
+test$price_doc
+pred
+```
+
+
+```{r}
+normalize <- function(x) { return((x - min(x)) / (max(x) - min(x))) }
+
+house_norm <- as.data.frame(lapply(house1, normalize))
+str(house1)
+
+house1 <- na.omit(house)
+samp <- sample(nrow(house_norm), 0.7 * nrow(house_norm))
+train <- house_norm[samp, ] 
+test <- house_norm[-samp, ]
+
+
+library(neuralnet)
+set.seed(12345) 
+
+
+concrete_model <- neuralnet(formula = price_doc ~ life_sq + floor + max_floor + build_year + num_room, data = train)
+
+
+str(house_macro$price_doc)
+
+model_results <- compute(concrete_model, test[2:6])
+
+predicted_strength <- model_results$net.result
+
+cor(predicted_strength, test$price_doc)
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
